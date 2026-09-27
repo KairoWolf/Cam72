@@ -245,3 +245,11 @@ CAM1_URL=tests/assets/wyze_cam_1.jpg CAM2_URL=tests/assets/side_cam_2.jpg DATA_D
 To train from the command line instead of the web page:
 `docker compose exec puppycam python -m puppycam.training --epochs 150`
 (add `--help` for all options).
+
+## Credits
+
+- [Ultralytics](https://github.com/ultralytics/ultralytics) YOLO26 for detection and training (AGPL-3.0), and its
+  SAM 2 integration ([Meta's Segment Anything 2](https://github.com/facebookresearch/sam2)) for the labeling outlines.
+- [docker-wyze-bridge](https://github.com/IDisposable/docker-wyze-bridge) (IDisposable's maintained fork of mrlt8's
+  bridge) to get RTSP from Wyze cameras.
+- [ntfy](https://ntfy.sh) for phone notifications.

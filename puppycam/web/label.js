@@ -333,6 +333,8 @@ canvas.addEventListener("wheel", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
+  // A focused button already handles Enter/Space itself; don't run the shortcut as well.
+  if (e.target.tagName === "BUTTON" && (e.key === "Enter" || e.key === " ")) return;
   if (e.key === " ") { S.space = true; e.preventDefault(); return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { undo(); e.preventDefault(); return; }
   if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -440,10 +442,19 @@ async function step(dir) {
 }
 
 async function save() {
-  if (!S.current) return;
+  if (!S.current || S.saving) return;
   if (S.objects.some((o) => o.pending)) { toast("Wait a moment, the outline is still being traced"); return; }
   const pups = S.objects.filter((o) => o.cls === 0).length;
   if (pups === 0 && !confirm("Save this frame with no puppies in it?")) return;
+  S.saving = true;
+  try {
+    await saveAndAdvance(pups);
+  } finally {
+    S.saving = false;
+  }
+}
+
+async function saveAndAdvance(pups) {
   try {
     await api(`/api/frames/${S.current}`, {
       method: "PUT",
@@ -491,6 +502,8 @@ $("skip").onclick = () => step(1);
 $("save").onclick = save;
 $("del").onclick = removeFrame;
 $("uploadBtn").onclick = () => $("upload").click();
+// Buttons must not keep keyboard focus, or Enter would press them instead of saving.
+document.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => b.blur()));
 $("upload").onchange = async () => {
   const files = [...$("upload").files];
   if (!files.length) return;
