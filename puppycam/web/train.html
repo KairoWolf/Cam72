@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PuppyCam - Train</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">PuppyCam</a>
+  <nav><a href="/">Live</a><a href="/label">Label</a><a href="/train" class="on">Train</a></nav>
+</header>
+<main class="train">
+  <div class="grid2">
+    <section class="card">
+      <h2>Your labeled frames</h2>
+      <div class="stat" id="labeled">-</div>
+      <div class="muted" id="labeledSub"></div>
+      <div class="progress"><div id="dataBar"></div></div>
+      <div class="muted" id="dataGoal"></div>
+      <ul class="tips muted">
+        <li>30+ frames: first useful model. 150+: strong. 300+ from both cameras: best.</li>
+        <li>Mix it up: night and day, feeding and sleeping, mom in and out, puppies spread out.</li>
+        <li>After each training round, label the frames the model got wrong (listed below) and train again.</li>
+      </ul>
+    </section>
+    <section class="card">
+      <h2>Train a model</h2>
+      <div class="form">
+        <label>Model size
+          <select id="base">
+            <option value="yolo26s-seg.pt">Small (fast)</option>
+            <option value="yolo26m-seg.pt">Medium</option>
+            <option value="yolo26l-seg.pt" selected>Large (recommended)</option>
+            <option value="yolo26x-seg.pt">Extra large (most accurate, slowest)</option>
+            <option value="current">Continue from the model in use (faster)</option>
+          </select></label>
+        <label>Epochs <input id="epochs" type="number" value="150" min="1" max="1000" style="width:90px"></label>
+        <label>Image size <input id="imgsz" type="number" value="1280" step="32" min="320" max="1920" style="width:100px"></label>
+        <button class="primary" id="start">Start training</button>
+        <button class="danger" id="stop">Stop</button>
+      </div>
+      <p id="phase" class="muted">No training yet.</p>
+      <div class="progress"><div id="trainBar"></div></div>
+      <div id="metrics" class="muted"></div>
+      <pre class="log" id="log" hidden></pre>
+    </section>
+  </div>
+  <section class="card">
+    <h2>Models</h2>
+    <table>
+      <thead><tr><th>Model</th><th>Frames (train / test)</th><th>Exact count</th><th>Avg. count error</th>
+        <th>Precision / recall</th><th>Threshold</th><th></th></tr></thead>
+      <tbody id="models"><tr><td colspan="7" class="muted">No trained models yet.</td></tr></tbody>
+    </table>
+    <p class="muted">"Exact count" = share of held-out test frames (never used for training) where the model counted
+      exactly the number of puppies you labeled. New models only replace the current one when they count at least as well.</p>
+    <div id="mistakes"></div>
+  </section>
+</main>
+<script src="/static/train.js"></script>
+</body>
+</html>

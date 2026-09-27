@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PuppyCam</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">PuppyCam</a>
+  <nav><a href="/" class="on">Live</a><a href="/label">Label</a><a href="/train">Train</a></nav>
+  <span class="spacer"></span>
+  <label class="muted"><input type="checkbox" id="sound"> Alarm sound</label>
+</header>
+<main class="live">
+  <section class="summary">
+    <div class="count-card" id="countCard">
+      <div class="big"><span id="count">-</span><span class="of">/ <span id="expected">-</span></span></div>
+      <div class="muted">puppies visible <span id="best"></span></div>
+    </div>
+    <div class="facts">
+      <div><span class="k">Mom</span><span id="mom">-</span></div>
+      <div><span class="k">All puppies last seen</span><span id="allSeen">-</span></div>
+      <div><span class="k">Model</span><span id="model">-</span></div>
+      <div><span class="k">Detection</span><span id="fps">-</span></div>
+    </div>
+    <div class="alerts" id="alerts"></div>
+  </section>
+  <section class="cams" id="cams"></section>
+  <section class="card history">
+    <h2>Alert history</h2>
+    <ul id="history"><li>No alerts yet.</li></ul>
+    <p class="muted" id="notify"></p>
+  </section>
+</main>
+<script src="/static/live.js"></script>
+</body>
+</html>

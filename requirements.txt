@@ -1,0 +1,9 @@
+# PyTorch comes from the Docker base image (CUDA build). Outside Docker, install torch first:
+# https://pytorch.org/get-started/locally/
+ultralytics==8.4.163
+opencv-python==5.0.0.93
+fastapi==0.141.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+requests==2.34.2
+PyYAML==6.0.3

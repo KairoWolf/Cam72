@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PuppyCam - Label</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="label">
+<header class="top">
+  <a class="brand" href="/">PuppyCam</a>
+  <nav><a href="/">Live</a><a href="/label" class="on">Label</a><a href="/train">Train</a></nav>
+  <span class="spacer"></span>
+  <span class="muted" id="stats"></span>
+</header>
+<div class="toolbar">
+  <div class="group">
+    <button id="clsPuppy" class="on" title="Key 1">1 Puppy</button>
+    <button id="clsMom" title="Key 2">2 Mom</button>
+  </div>
+  <div class="group">
+    <button id="boxOnly" title="Key B: skip the AI outline and keep the plain box">Box only</button>
+    <button id="hide" title="Key H: hide the outlines to look at the picture">Hide outlines</button>
+    <button id="undo" title="Ctrl+Z">Undo</button>
+    <button id="clear" title="Remove everything on this frame">Clear</button>
+  </div>
+  <span class="counter" id="counter"></span>
+  <span class="muted" id="frameInfo"></span>
+  <span class="spacer"></span>
+  <div class="group">
+    <button id="prev" title="Left arrow">&larr; Prev</button>
+    <button id="skip" title="Right arrow or S">Skip &rarr;</button>
+    <button id="del" class="danger" title="Delete this frame from the dataset">Delete frame</button>
+    <button id="save" class="primary" title="Enter">Save &amp; next</button>
+  </div>
+</div>
+<div class="workspace">
+  <div class="stage" id="stage">
+    <canvas id="canvas"></canvas>
+    <div class="overlay-msg" id="msg">Loading...</div>
+  </div>
+  <aside class="side">
+    <div class="tabs">
+      <button data-status="unlabeled" class="on">To label</button>
+      <button data-status="labeled">Done</button>
+      <button data-status="all">All</button>
+    </div>
+    <div class="tabs">
+      <input type="file" id="upload" multiple accept="image/*,video/*" hidden>
+      <button id="uploadBtn" style="flex:1">Upload photos / videos</button>
+    </div>
+    <div class="queue" id="queue"></div>
+    <div class="help">
+      <b>How to label</b><br>
+      Drag a box around <b>one</b> puppy - the AI traces its outline. Label every puppy you can see, even
+      if only its head or back shows (box just the visible part).<br>
+      <kbd>Click</kbd> select &nbsp; <kbd>Del</kbd> remove &nbsp; <kbd>1</kbd>/<kbd>2</kbd> puppy/mom<br>
+      Dashed = model guess (check it). Click a dotted <b>?</b> to accept it.<br>
+      <kbd>Wheel</kbd> zoom &nbsp; <kbd>Right-drag</kbd> or <kbd>Space</kbd>+drag pan &nbsp; <kbd>R</kbd> reset<br>
+      <kbd>Enter</kbd> save &amp; next &nbsp; <kbd>H</kbd> hide outlines &nbsp; <kbd>Ctrl+Z</kbd> undo
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/static/label.js"></script>
+</body>
+</html>

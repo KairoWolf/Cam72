@@ -1,0 +1,43 @@
+# Start:           docker compose up -d --build
+# With Wyze bridge: docker compose --profile wyze up -d --build
+# Then open http://localhost:8080
+services:
+  puppycam:
+    build: .
+    image: puppycam:latest
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATA_DIR: /data
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data # labeled frames, trained models, downloaded weights
+    shm_size: "8gb" # training data loaders need shared memory
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Only needed if a Wyze camera has no RTSP of its own: turns Wyze cameras into local RTSP streams.
+  # Its camera URLs look like rtsp://wyze-bridge:8554/<camera_name> (see http://localhost:5080).
+  wyze-bridge:
+    image: idisposablegithub365/wyze-bridge:latest
+    profiles: ["wyze"]
+    restart: unless-stopped
+    environment:
+      WYZE_EMAIL: ${WYZE_EMAIL:-}
+      WYZE_PASSWORD: ${WYZE_PASSWORD:-}
+      WYZE_API_ID: ${WYZE_API_ID:-}
+      WYZE_API_KEY: ${WYZE_API_KEY:-}
+      WYZE_TOTP_KEY: ${WYZE_TOTP_KEY:-}
+    ports:
+      - "5080:5080" # bridge web page: shows your camera names
+      - "8554:8554" # RTSP
+    volumes:
+      - ./wyze-config:/config

@@ -1,0 +1,9 @@
+.env
+.git
+data
+wyze-config
+tests
+**/__pycache__
+*.pt
+.venv
+venv
