@@ -145,3 +145,23 @@ def test_camera_source_kinds(tmp_path):
     assert source_kind("clip.mp4") == "video"
     assert redact_url("rtsp://admin:p@ss@10.0.0.2:554/stream1") == "rtsp://admin:***@10.0.0.2:554/stream1"
     assert redact_url("rtsp://10.0.0.2/live") == "rtsp://10.0.0.2/live"
+
+
+def test_training_status_sees_command_line_runs(settings):
+    import json
+    import os
+
+    from puppycam.server import TrainingManager
+
+    trainer = TrainingManager(settings)
+    run = settings.data_dir / "runs" / "cli-run"
+    run.mkdir(parents=True)
+    state = {"phase": "training", "pid": os.getpid(), "started": time.time() - 300, "epoch": 3}
+    (run / "state.json").write_text(json.dumps(state))
+    status = trainer.status()
+    assert status["name"] == "cli-run" and status["running"] and status["state"]["phase"] == "training"
+    with pytest.raises(RuntimeError):
+        trainer.start("yolo26n-seg.pt", 1, 320)  # one run at a time
+    (run / "state.json").write_text(json.dumps({**state, "pid": 2**22 + 12345}))  # process is gone
+    status = trainer.status()
+    assert not status["running"] and status["state"]["phase"] == "failed"

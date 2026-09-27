@@ -6,6 +6,7 @@ import asyncio
 import base64
 import json
 import logging
+import os
 import re
 import secrets
 import signal
@@ -48,7 +49,7 @@ class TrainingManager:
         return self.proc is not None and self.proc.poll() is None
 
     def start(self, base: str, epochs: int, imgsz: int) -> str:
-        if self.running:
+        if self.running or self.status().get("running"):
             raise RuntimeError("a training run is already in progress")
         self.name = datetime.now().strftime("puppies-%Y%m%d-%H%M%S")
         run_dir = self.runs / self.name
@@ -83,10 +84,18 @@ class TrainingManager:
                 state_path.write_text(json.dumps(state))
 
     def latest_name(self) -> str | None:
-        if self.name:
+        runs = [p for p in self.runs.iterdir() if (p / "state.json").is_file()]
+        if not runs:
             return self.name
-        runs = sorted((p for p in self.runs.iterdir() if (p / "state.json").is_file()), key=lambda p: p.name)
-        return runs[-1].name if runs else None
+        return max(runs, key=lambda p: (p / "state.json").stat().st_mtime).name
+
+    @staticmethod
+    def _alive(pid) -> bool:
+        try:
+            os.kill(int(pid), 0)
+            return True
+        except (OSError, TypeError, ValueError):
+            return False
 
     def status(self) -> dict:
         name = self.latest_name()
@@ -97,9 +106,11 @@ class TrainingManager:
             state = json.loads((run_dir / "state.json").read_text())
         except (OSError, json.JSONDecodeError):
             state = {"phase": "starting"}
-        if not self.running and state.get("phase") not in ("done", "failed", "stopped"):
-            if self.proc is not None or time.time() - state.get("started", 0) > 60:
-                state.update(phase="failed", message=state.get("message") or "Training process exited unexpectedly")
+        unfinished = state.get("phase") not in ("done", "failed", "stopped")
+        # A run started from the command line (docker compose exec ...) counts as running too.
+        running = self.running or (unfinished and self._alive(state.get("pid")))
+        if unfinished and not running and (self.proc is not None or time.time() - state.get("started", 0) > 60):
+            state.update(phase="failed", message=state.get("message") or "Training process exited unexpectedly")
         tail = ""
         log_path = run_dir / "train.log"
         if log_path.is_file():
@@ -109,7 +120,7 @@ class TrainingManager:
                 text = ANSI.sub("", fh.read().decode("utf-8", "replace"))
             lines = [line.split("\r")[-1] for line in text.split("\n")]
             tail = "\n".join(line for line in lines if line.strip())[-6000:]
-        return {"running": self.running, "name": name, "state": state, "log": tail}
+        return {"running": running, "name": name, "state": state, "log": tail}
 
 
 class LabelsIn(BaseModel):
