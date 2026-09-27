@@ -185,8 +185,11 @@ def main(argv: list[str] | None = None) -> int:
 
         def on_epoch_end(trainer):
             metrics = {k: round(float(v), 4) for k, v in (trainer.metrics or {}).items()}
-            state.update(phase="training", epoch=trainer.epoch + 1, epochs=trainer.epochs, metrics=metrics,
-                         message=f"Epoch {trainer.epoch + 1}/{trainer.epochs}")
+            epoch = trainer.epoch + 1
+            # Ultralytics fires this once more after the last epoch, for the final check of best.pt.
+            message = f"Epoch {epoch}/{trainer.epochs}" if epoch <= trainer.epochs else "Final check of the best epoch"
+            state.update(phase="training", epoch=min(epoch, trainer.epochs), epochs=trainer.epochs, metrics=metrics,
+                         message=message)
 
         model.add_callback("on_fit_epoch_end", on_epoch_end)
         state.update(phase="training", message="Training (the first epoch includes a warm-up)")
@@ -241,8 +244,9 @@ def main(argv: list[str] | None = None) -> int:
         verdict = "activated" if activate else "kept the current model (it counts better)"
         state.update(phase="done", finished=time.time(), eval=meta["eval"], previous=previous_report,
                      activated=activate,
-                     message=f"Done: exact count on {report['frames']} held-out frames = "
-                             f"{report['count_accuracy'] * 100:.1f}% (threshold {thr:.2f}); {verdict}.")
+                     message=f"Done: exact count on {report['frames']} "
+                             f"{'training frames (too few to hold any out)' if info['val_overlaps_train'] else 'held-out frames'}"
+                             f" = {report['count_accuracy'] * 100:.1f}% (threshold {thr:.2f}); {verdict}.")
         log.info(state.data["message"])
         return 0
     except KeyboardInterrupt:

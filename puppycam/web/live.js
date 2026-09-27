@@ -72,7 +72,8 @@ function update(s) {
   card.classList.toggle("low", s.count != null && s.count < s.expected);
   const best = s.cameras.find((c) => c.slug === s.best_camera);
   $("best").textContent = best && s.cameras.length > 1 ? `(best view: ${best.label})` : "";
-  $("mom").textContent = s.mom_visible == null ? "-" : (s.mom_visible ? "with the puppies" : "not visible");
+  $("mom").textContent = !s.model.mom_alerts ? (s.model.name ? "not trained yet (label mom a few times)" : "-")
+    : (s.mom_visible == null ? "-" : (s.mom_visible ? "with the puppies" : "not visible"));
   $("allSeen").textContent = s.model.name ? ago(s.alerts.last_all_visible) : "-";
   const ev = s.model.eval;
   $("model").innerHTML = s.model.name
