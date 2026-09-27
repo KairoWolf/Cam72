@@ -146,7 +146,8 @@ The live view switches to the new model automatically if it counts at least as w
 ### 4. Repeat
 
 Label the new frames (the uncertain ones come first in the queue), train again, and watch the
-exact-count number climb.
+exact-count number climb. For later rounds, choosing **Continue from the model in use** as the model
+size trains faster, because it starts from what the current model already knows.
 
 ## Phone alerts
 
