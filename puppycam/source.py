@@ -36,11 +36,12 @@ def source_kind(url: str) -> str:
 class FrameSource:
     """Reads a camera (or a test file) in a thread and exposes the latest frame."""
 
-    def __init__(self, url: str, name: str, image_seconds: float = 5.0):
+    def __init__(self, url: str, name: str, image_seconds: float = 5.0, max_fps: float = 15.0):
         self.url = url
         self.name = name
         self.kind = source_kind(url)
         self.image_seconds = image_seconds
+        self.min_interval = 1.0 / max_fps
         self.connected = False
         self.error: str | None = None
         self.fps = 0.0
@@ -131,8 +132,15 @@ class FrameSource:
         log.info("camera %s connected (%s)", self.name, self._safe_url())
         is_file = self.kind == "video"
         delay = 1.0 / (cap.get(cv2.CAP_PROP_FPS) or 15.0) if is_file else 0.0
+        last_publish = 0.0
         try:
             while not self._stop.is_set():
+                if not is_file and time.time() - last_publish < self.min_interval:
+                    # Keep draining the stream, but skip the color conversion for frames nobody uses.
+                    if not cap.grab():
+                        raise RuntimeError("stream ended or timed out")
+                    continue
+                last_publish = time.time()
                 ok, frame = cap.read()
                 if not ok or frame is None:
                     if is_file:  # loop test videos forever

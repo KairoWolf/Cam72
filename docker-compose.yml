@@ -11,6 +11,7 @@ services:
         required: false
     environment:
       DATA_DIR: /data
+      TZ: ${TZ:-UTC}
     ports:
       - "8080:8080"
     volumes:
@@ -36,6 +37,7 @@ services:
       WYZE_API_ID: ${WYZE_API_ID:-}
       WYZE_API_KEY: ${WYZE_API_KEY:-}
       WYZE_TOTP_KEY: ${WYZE_TOTP_KEY:-}
+      TZ: ${TZ:-UTC}
     ports:
       - "5080:5080" # bridge web page: shows your camera names
       - "8554:8554" # RTSP

@@ -64,6 +64,7 @@ very reliable. The **Train** page shows the exact-count accuracy after every rou
    CAM2_URL=rtsp://user:password@192.168.1.51:554/stream1
    EXPECTED_PUPPIES=9
    NTFY_TOPIC=puppies-choose-a-long-random-name-123
+   TZ=America/New_York
    ```
 6. **Start it** from PowerShell inside the project folder:
    ```powershell
@@ -185,6 +186,7 @@ All settings live in `.env`; restart after changing them (`docker compose up -d`
 | `CAPTURE_EVERY_MINUTES` | 10 | Save a frame for labeling this often (0 turns it off) |
 | `CAPTURE_UNCERTAIN` | true | Save frames where the model is unsure |
 | `DEVICE` | auto | `0` for the first GPU, `cpu` to force the CPU |
+| `TZ` | UTC | Your time zone, for example `America/New_York` or `Europe/London` |
 
 ## Troubleshooting
 

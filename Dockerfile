@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DATA_DIR=/data
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 curl \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 curl tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
